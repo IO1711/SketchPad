@@ -11,6 +11,8 @@ extension Double {
 struct ContentView: View {
     
     @State var stroke: Stroke = Stroke(stroke: [])
+    @State var drawing: Drawing = Drawing(drawing: [])
+    @State var brush: Brush = Brush()
     
     var body: some View {
         
@@ -20,49 +22,70 @@ struct ContentView: View {
                    rendersAsynchronously: false
             ) { context, size in
                 
-                context.draw(Text("String(size)"), in: CGRect())
+                var path = Path()
                 
-                /*let circle = Path(ellipseIn: CGRect(x: 20, y: 20, width: 100, height: 100))
-                let circle2 = Path(ellipseIn: CGRect(x: 25, y: 25, width: 100, height: 100))
-                let circle3 = Path(ellipseIn: CGRect(x: 30, y: 30, width: 100, height: 100))
-                
-                context.fill(circle, with: .color(.red))
-                context.fill(circle2, with: .color(.red))
-                context.fill(circle3, with: .color(.red))*/
-                
-                /*ForEach(stroke.stroke, id: \.self) { point in
-                    let p = Path(ellipseIn: CGRect(x: point.x, y: point.y, width: 10, height: 10))
+                if !stroke.stroke.isEmpty {
+                    path.move(to: CGPoint(x: stroke.stroke[0].x, y: stroke.stroke[0].y))
                     
-                    context.fill(p, with: .color(.red))
-                }*/
-                
-                for point in stroke.stroke {
-                    let p = Path(ellipseIn: CGRect(x: point.x, y: point.y, width: 10, height: 10))
+                    for point in stroke.stroke {
+                        
+                        path.addLine(to: CGPoint(x: point.x, y: point.y))
+                    }
                     
-                    context.fill(p, with: .color(.red))
+                    context.stroke(path, with: .color(brush.getColor()), style: StrokeStyle(lineWidth: brush.getThickness(), lineCap: .round, lineJoin: .round))
+                }
+                
+                
+                for str in drawing.drawing {
+                    
+                    path.move(to: CGPoint(x: str.stroke[0].x, y: str.stroke[0].y))
+                    
+                    for point in str.stroke {
+                        
+                        path.addLine(to: CGPoint(x: point.x, y: point.y))
+                    }
+                    
+                    context.stroke(path, with: .color(brush.getColor()), style: StrokeStyle(lineWidth: brush.getThickness(), lineCap: .round, lineJoin: .round))
                 }
                 
                 //(402.0, 778.0)
                 //(402.0, 874.0
             }
             .id(stroke.stroke.count)
+            
+            HStack {
+                Button("Undo") {
+                    undo()
+                }
+                .buttonStyle(.borderedProminent)
+                
+                Button("Redo") {
+                    drawing.redo()
+                }
+                .buttonStyle(.borderedProminent)
+            }
         }
         .padding()
         /*.onTapGesture { location in
-            print(location)
-            stroke.addPoint(Point(x: location.x, y: location.y))
-        }*/
+         print(location)
+         stroke.addPoint(Point(x: location.x, y: location.y))
+         }*/
         .gesture(
             DragGesture(minimumDistance: 0)
                 .onChanged{ value in
                     print(value.translation)
-                    //stroke.addPoint(Point(x: value.location.x, y: value.location.y))
+                    stroke.addPoint(Point(x: value.location.x - 15, y: value.location.y - 15))
+                }
+                .onEnded{ _ in
+                    drawing.addStroke(stroke)
+                    stroke.resetStroke()
+                    print(drawing)
                 }
         )
         
         /*.onAppear{
-            initStroke()
-        }*/
+         initStroke()
+         }*/
     }
     
     
@@ -70,14 +93,18 @@ struct ContentView: View {
         var i: Double = 1
         
         while i < 90 {
-            var x = 170 + 100 * cos(i.toRadians)
-            var y = 170 + 100 * sin(i.toRadians)
+            let x = 170 + 100 * cos(i.toRadians)
+            let y = 170 + 100 * sin(i.toRadians)
             
             stroke.addPoint(Point(x: x, y: y))
             i += 1
         }
         
         
+    }
+    
+    func undo() {
+        drawing.undo()
     }
 }
 

@@ -12,4 +12,8 @@ struct Stroke {
     mutating func addPoint(_ point: Point) {
         self.stroke.append(point)
     }
+    
+    mutating func resetStroke() {
+        self.stroke = []
+    }
 }

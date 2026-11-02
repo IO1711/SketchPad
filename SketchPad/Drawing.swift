@@ -2,7 +2,7 @@
 //  Drawing.swift
 //  SketchPad
 //
-//  Created by Bilolbek Rayimov on 29/10/2026.
+//  Created by Bilolbek Rayimov on 02/11/2026.
 //
 
 
@@ -20,15 +20,14 @@ struct Drawing {
     
     mutating func redo() {
         if let lastRemoved = self.lastRemoved {
-            drawing
-                .append(lastRemoved)
+            self.drawing.append(lastRemoved)
         }
     }
     
     mutating func clear() {
         self.drawing = []
         
-        if let lastRemoved = self.lastRemoved {
+        if let _ = self.lastRemoved {
             self.lastRemoved = nil
         }
     }

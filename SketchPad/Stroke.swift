@@ -2,13 +2,11 @@
 //  Stroke.swift
 //  SketchPad
 //
-//  Created by Bilolbek Rayimov on 27/10/2026.
+//  Created by Bilolbek Rayimov on 02/11/2026.
 //
 
-import Foundation
 
-struct Stroke: Identifiable {
-    let id: UUID = UUID()
+struct Stroke {
     var stroke: [Point]
     var brush: Brush = Brush()
     

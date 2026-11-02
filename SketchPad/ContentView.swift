@@ -10,64 +10,78 @@ extension Double {
 
 struct ContentView: View {
     
-    @State var stroke: Stroke = Stroke(stroke: [])
     @State var drawing: Drawing = Drawing(drawing: [])
+    @State var stroke: Stroke = Stroke(stroke: [])
     
     var body: some View {
-        
         VStack {
-            Canvas(opaque: false,
-                   colorMode: .linear,
-                   rendersAsynchronously: false
+            Canvas(
+                opaque: false,
+                colorMode: .linear,
+                rendersAsynchronously: false
             ) { context, size in
                 
                 var path = Path()
                 
+                //live stroke
                 if !stroke.stroke.isEmpty {
                     path.move(to: CGPoint(x: stroke.stroke[0].x, y: stroke.stroke[0].y))
                     
                     for point in stroke.stroke {
-                        
                         path.addLine(to: CGPoint(x: point.x, y: point.y))
                     }
                     
-                    context.stroke(path, with: .color(stroke.brush.getColor()), style: StrokeStyle(lineWidth: stroke.brush.getThickness(), lineCap: .round, lineJoin: .round))
+                    context.stroke(path, with: .color(stroke.brush.color), style: StrokeStyle(lineWidth: stroke.brush.thickness))
                 }
                 
                 
+                //saved drawing
                 for str in drawing.drawing {
                     var path = Path()
                     
                     path.move(to: CGPoint(x: str.stroke[0].x, y: str.stroke[0].y))
                     
                     for point in str.stroke {
-                        
                         path.addLine(to: CGPoint(x: point.x, y: point.y))
                     }
                     
-                    context.stroke(path, with: .color(str.brush.getColor()), style: StrokeStyle(lineWidth: str.brush.getThickness(), lineCap: .round, lineJoin: .round))
+                    context.stroke(path, with: .color(str.brush.color), style: StrokeStyle(lineWidth: str.brush.thickness))
                 }
                 
-                //(402.0, 778.0)
-                //(402.0, 874.0
             }
-            .id(stroke.stroke.count)
+            .gesture (
+                DragGesture(minimumDistance: 0)
+                    .onChanged { value in
+                        let location = value.location
+                        
+                        stroke.addPoint(Point(x: location.x, y: location.y))
+                        
+                        
+                    }
+                    .onEnded { value in
+                        drawing.addStroke(stroke)
+                        
+                        stroke.resetStroke()
+                    }
+                    
+            )
             
             ColorPicker("Pick color", selection: $stroke.brush.color)
             
             Slider(value: $stroke.brush.thickness, in: 0...10)
-                .onChange(of: stroke.brush.thickness) { oldValue, newValue in
-                    stroke.brush.setThickness(newValue)
-                }
             
             HStack {
-                Button("Undo") {
-                    undo()
+                Button {
+                    drawing.undo()
+                } label: {
+                    Image(systemName: "arrow.uturn.backward")
                 }
                 .buttonStyle(.borderedProminent)
                 
-                Button("Redo") {
+                Button {
                     drawing.redo()
+                } label: {
+                    Image(systemName: "arrow.uturn.forward")
                 }
                 .buttonStyle(.borderedProminent)
                 
@@ -77,48 +91,7 @@ struct ContentView: View {
                 .buttonStyle(.borderedProminent)
             }
         }
-        .padding()
-        /*.onTapGesture { location in
-         print(location)
-         stroke.addPoint(Point(x: location.x, y: location.y))
-         }*/
-        .gesture(
-            DragGesture(minimumDistance: 0)
-                .onChanged{ value in
-                    //print(value.translation)
-                    stroke.addPoint(Point(x: value.location.x - 15, y: value.location.y - 15))
-                }
-                .onEnded{ _ in
-                    drawing.addStroke(stroke)
-                    stroke.resetStroke()
-                    //print(drawing)
-                }
-        )
-        .onAppear{
-            print(stroke)
-        }
-        .onChange(of: stroke.brush.thickness) {
-            print(stroke)
-        }
-    }
-    
-    
-    func initStroke() {
-        var i: Double = 1
-        
-        while i < 90 {
-            let x = 170 + 100 * cos(i.toRadians)
-            let y = 170 + 100 * sin(i.toRadians)
-            
-            stroke.addPoint(Point(x: x, y: y))
-            i += 1
-        }
-        
-        
-    }
-    
-    func undo() {
-        drawing.undo()
+        .padding(10)
     }
 }
 

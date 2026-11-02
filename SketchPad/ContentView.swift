@@ -12,7 +12,6 @@ struct ContentView: View {
     
     @State var stroke: Stroke = Stroke(stroke: [])
     @State var drawing: Drawing = Drawing(drawing: [])
-    @State var brush: Brush = Brush()
     
     var body: some View {
         
@@ -32,11 +31,12 @@ struct ContentView: View {
                         path.addLine(to: CGPoint(x: point.x, y: point.y))
                     }
                     
-                    context.stroke(path, with: .color(brush.getColor()), style: StrokeStyle(lineWidth: brush.getThickness(), lineCap: .round, lineJoin: .round))
+                    context.stroke(path, with: .color(stroke.brush.getColor()), style: StrokeStyle(lineWidth: stroke.brush.getThickness(), lineCap: .round, lineJoin: .round))
                 }
                 
                 
                 for str in drawing.drawing {
+                    var path = Path()
                     
                     path.move(to: CGPoint(x: str.stroke[0].x, y: str.stroke[0].y))
                     
@@ -45,13 +45,20 @@ struct ContentView: View {
                         path.addLine(to: CGPoint(x: point.x, y: point.y))
                     }
                     
-                    context.stroke(path, with: .color(brush.getColor()), style: StrokeStyle(lineWidth: brush.getThickness(), lineCap: .round, lineJoin: .round))
+                    context.stroke(path, with: .color(str.brush.getColor()), style: StrokeStyle(lineWidth: str.brush.getThickness(), lineCap: .round, lineJoin: .round))
                 }
                 
                 //(402.0, 778.0)
                 //(402.0, 874.0
             }
             .id(stroke.stroke.count)
+            
+            ColorPicker("Pick color", selection: $stroke.brush.color)
+            
+            Slider(value: $stroke.brush.thickness, in: 0...10)
+                .onChange(of: stroke.brush.thickness) { oldValue, newValue in
+                    stroke.brush.setThickness(newValue)
+                }
             
             HStack {
                 Button("Undo") {
@@ -61,6 +68,11 @@ struct ContentView: View {
                 
                 Button("Redo") {
                     drawing.redo()
+                }
+                .buttonStyle(.borderedProminent)
+                
+                Button("Clear") {
+                    drawing.clear()
                 }
                 .buttonStyle(.borderedProminent)
             }
@@ -73,19 +85,21 @@ struct ContentView: View {
         .gesture(
             DragGesture(minimumDistance: 0)
                 .onChanged{ value in
-                    print(value.translation)
+                    //print(value.translation)
                     stroke.addPoint(Point(x: value.location.x - 15, y: value.location.y - 15))
                 }
                 .onEnded{ _ in
                     drawing.addStroke(stroke)
                     stroke.resetStroke()
-                    print(drawing)
+                    //print(drawing)
                 }
         )
-        
-        /*.onAppear{
-         initStroke()
-         }*/
+        .onAppear{
+            print(stroke)
+        }
+        .onChange(of: stroke.brush.thickness) {
+            print(stroke)
+        }
     }
     
     

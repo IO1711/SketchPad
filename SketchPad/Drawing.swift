@@ -24,4 +24,12 @@ struct Drawing {
                 .append(lastRemoved)
         }
     }
+    
+    mutating func clear() {
+        self.drawing = []
+        
+        if let lastRemoved = self.lastRemoved {
+            self.lastRemoved = nil
+        }
+    }
 }

@@ -9,8 +9,8 @@ import Foundation
 import SwiftUI
 
 struct Brush {
-    private var thickness: CGFloat = 4
-    private var color: Color = .red
+    var thickness: CGFloat = 4
+    var color: Color = .red
     
     mutating func setColor(_ color: Color) {
         self.color = color

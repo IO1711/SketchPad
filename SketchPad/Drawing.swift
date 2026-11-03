@@ -8,27 +8,27 @@
 
 struct Drawing {
     var drawing: [Stroke]
-    var lastRemoved: Stroke?
+    var lastRemoved: [Stroke]
     
     mutating func addStroke(_ stroke: Stroke) {
         self.drawing.append(stroke)
     }
     
     mutating func undo() {
-        self.lastRemoved = self.drawing.popLast()
+        if let last = self.drawing.popLast() {
+            self.lastRemoved.append(last)
+        }
     }
     
     mutating func redo() {
-        if let lastRemoved = self.lastRemoved {
-            self.drawing.append(lastRemoved)
+        if let last = self.lastRemoved.popLast() {
+            self.drawing.append(last)
         }
     }
     
     mutating func clear() {
         self.drawing = []
         
-        if let _ = self.lastRemoved {
-            self.lastRemoved = nil
-        }
+        self.lastRemoved = []
     }
 }

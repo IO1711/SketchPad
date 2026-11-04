@@ -13,11 +13,25 @@ struct ContentView: View {
     
     var body: some View {
         TabView {
-            MainView()
+            
+            Tab("Sketch", systemImage: "paintbrush.fill") {
+                MainView()
+            }
+            
+            Tab("Brush", systemImage: "gear") {
+                SecondaryView()
+            }
+            
+            Tab("Show", systemImage: "capsule.on.rectangle.liquid.glass.fill") {
+                ShowSaved()
+            }
+            
+            /*MainView()
                 .tag(1)
             SecondaryView()
-                .tag(2)
+                .tag(2)*/
         }
+        
     }
 }
 

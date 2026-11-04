@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct Stroke {
+struct Stroke: Codable {
     var stroke: [Point]
     var brush: BrushStyle = BrushStyle(thickness: CGFloat(8), color: .mint)
     

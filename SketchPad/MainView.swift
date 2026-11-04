@@ -6,9 +6,11 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct MainView: View {
     
+    @Environment(\.modelContext) private var modelContext
     @State var drawing: Drawing = Drawing(drawing: [], lastRemoved: [])
     @State var stroke: Stroke = Stroke(stroke: [])
     @Environment(Brush.self) private var globalBrush
@@ -95,6 +97,10 @@ struct MainView: View {
                     drawing.clear()
                 }
                 .buttonStyle(.borderedProminent)
+                
+                Button("Save") {
+                    modelContext.insert(drawing)
+                }
             }
         }
         .padding(10)

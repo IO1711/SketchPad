@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Point {
+struct Point: Codable {
     let x: CGFloat
     let y: CGFloat
 }

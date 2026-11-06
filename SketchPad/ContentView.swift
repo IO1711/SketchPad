@@ -18,6 +18,10 @@ struct ContentView: View {
                 MainView()
             }
             
+            Tab("InMemory", systemImage: "paintbrush.pointed.fill") {
+                InMemoryPad()
+            }
+            
             Tab("Brush", systemImage: "gear") {
                 SecondaryView()
             }

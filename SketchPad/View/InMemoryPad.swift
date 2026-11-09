@@ -6,6 +6,13 @@
 //
 
 import SwiftUI
+import UniformTypeIdentifiers
+
+extension UTType {
+    static var customType: UTType {
+        UTType(exportedAs: "com.bilolbek.sketchpad.layer")
+    }
+}
 
 struct InMemoryPad: View {
     
@@ -138,10 +145,9 @@ struct InMemoryPad: View {
                                 
                                 layers.append(newLayer)
                                 
-                                activeLayerIndex += 1
+                                activeLayerIndex = layers.count - 1
                                 
                                 
-                                print(layerName)
                             }
                             
                             Button("Discard") {
@@ -165,9 +171,48 @@ struct InMemoryPad: View {
                         }
                     }
                 }
+                
+                ToolbarItem(placement: .topBarLeading) {
+                    HStack {
+                        Button("Copy"){
+                            guard let encodedLayer = try? JSONEncoder().encode(activeLayer) else { return }
+                            
+                            
+                            UIPasteboard.general.setData(encodedLayer, forPasteboardType: UTType.customType.identifier)
+                            
+                            
+                            
+                            do {
+                                let data = try JSONDecoder().decode(Layer.self, from: encodedLayer)
+                                
+                                print(data.drawing)
+                            } catch {
+                                print("error: \(error)")
+                            }
+                            
+                        }
+                        
+                        Button("Paste") {
+                            guard let copiedLayer = pasteLayer() else { return }
+                            
+                            layers.append(copiedLayer)
+                            
+                            activeLayerIndex = layers.count - 1
+                        }
+                    }
+                }
             }
         }
 
+    }
+    
+    
+    func pasteLayer() -> Layer? {
+        guard let data = UIPasteboard.general.data(forPasteboardType: UTType.customType.identifier) else {
+            return nil
+        }
+        
+        return try? JSONDecoder().decode(Layer.self, from: data)
     }
 }
 

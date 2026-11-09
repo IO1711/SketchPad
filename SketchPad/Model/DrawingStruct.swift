@@ -9,7 +9,7 @@
 import SwiftData
 import Foundation
 
-struct DrawingStruct {
+struct DrawingStruct: Decodable, Encodable {
     var id: UUID
     var drawing: [Stroke]
     var lastRemoved: [Stroke]
